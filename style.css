@@ -62,3 +62,116 @@ li {
     text-decoration: line-through;
     color: gray;
 }
+
+//2
+const taskInput = document.getElementById("taskInput");
+const category = document.getElementById("category");
+const addBtn = document.getElementById("addBtn");
+
+const workList = document.getElementById("workList");
+const personalList = document.getElementById("personalList");
+
+// Load tasks from localStorage
+document.addEventListener("DOMContentLoaded", loadTasks);
+
+// Add task
+addBtn.addEventListener("click", addTask);
+
+function addTask() {
+  const taskText = taskInput.value.trim();
+  if (taskText === "") return alert("Enter a task!");
+
+  const taskObj = {
+    text: taskText,
+    category: category.value
+  };
+
+  saveTask(taskObj);
+  displayTask(taskObj);
+
+  taskInput.value = "";
+}
+
+// Display task
+function displayTask(taskObj) {
+  const li = document.createElement("li");
+  li.className = "task";
+  li.draggable = true;
+
+  li.innerHTML = `
+    ${taskObj.text}
+    <span class="delete">❌</span>
+  `;
+
+  // Delete event
+  li.querySelector(".delete").addEventListener("click", () => {
+    li.remove();
+    deleteTask(taskObj);
+  });
+
+  // Drag events
+  li.addEventListener("dragstart", dragStart);
+
+  if (taskObj.category === "Work") {
+    workList.appendChild(li);
+  } else {
+    personalList.appendChild(li);
+  }
+}
+
+// Save to localStorage
+function saveTask(taskObj) {
+  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  tasks.push(taskObj);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+// Load tasks
+function loadTasks() {
+  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  tasks.forEach(displayTask);
+}
+
+// Delete from storage
+function deleteTask(taskObj) {
+  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  tasks = tasks.filter(t => t.text !== taskObj.text);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+// Drag and Drop
+function dragStart(e) {
+  e.dataTransfer.setData("text", e.target.innerText);
+}
+
+workList.addEventListener("dragover", e => e.preventDefault());
+personalList.addEventListener("dragover", e => e.preventDefault());
+
+workList.addEventListener("drop", dropTask.bind(null, "Work"));
+personalList.addEventListener("drop", dropTask.bind(null, "Personal"));
+
+function dropTask(categoryType, e) {
+  e.preventDefault();
+  const text = e.dataTransfer.getData("text").replace("❌", "").trim();
+
+  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+  tasks = tasks.map(task => {
+    if (task.text === text) {
+      task.category = categoryType;
+    }
+    return task;
+  });
+
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+
+  refreshUI();
+}
+
+// Refresh UI
+function refreshUI() {
+  workList.innerHTML = "";
+  personalList.innerHTML = "";
+
+  loadTasks();
+}
