@@ -90,3 +90,44 @@ function editTask(id) {
         renderTasks();
     }
 }
+
+//2
+body {
+  font-family: Arial;
+  background: #f4f4f4;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  background: white;
+  padding: 20px;
+  margin-top: 40px;
+  width: 300px;
+  border-radius: 10px;
+}
+
+input, select, button {
+  width: 100%;
+  margin: 5px 0;
+  padding: 8px;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+}
+
+.task {
+  background: #e3e3e3;
+  margin: 5px 0;
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  cursor: grab;
+}
+
+.delete {
+  color: red;
+  cursor: pointer;
+}
